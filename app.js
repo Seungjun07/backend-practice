@@ -26,6 +26,26 @@ app.get("/tasks/:id", (req, res) => {
   res.send(task);
 });
 
+// 할 일 생성
+app.post("/tasks", (req, res) => {
+  const { title } = req.body;
+
+  if (!title) {
+    return res.status(400).json({ message: "title은 필수입니다." });
+  }
+
+  const ids = tasks.map((task) => task.id);
+  const newTask = {
+    id: Math.max(...ids) + 1,
+    title,
+    isComplete: false,
+  };
+
+  tasks.push(newTask);
+
+  res.status(201).send(newTask);
+});
+
 app.listen(3000, () => {
   console.log("Server Started");
 });
