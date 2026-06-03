@@ -46,6 +46,48 @@ app.post("/tasks", (req, res) => {
   res.status(201).send(newTask);
 });
 
+// 할 일 수정
+app.patch("/tasks/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  const task = tasks.find((task) => task.id === id);
+
+  if (!task) {
+    return res.status(404).send({ message: "Task not found." });
+  }
+
+  const allowedFields = ["title", "isComplete"];
+
+  // 유효성 검사 - 변경되면 안되는 필드 확인 (ex) id )
+  const isValid = Object.keys(req.body).every((key) =>
+    allowedFields.includes(key),
+  );
+
+  if (!isValid) {
+    return res.status(400).send({ message: "Invalid update field." });
+  }
+
+  Object.keys(req.body).forEach((key) => {
+    task[key] = req.body[key];
+  });
+
+  res.send(task);
+});
+
+// 할 일 삭제
+app.delete("/tasks/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  const idx = tasks.findIndex((task) => task.id === id);
+
+  if (idx < 0) {
+    return res.status(404).send({ message: "Task not found." });
+  }
+
+  tasks.splice(idx, 1);
+  res.sendStatus(204);
+});
+
 app.listen(3000, () => {
   console.log("Server Started");
 });
